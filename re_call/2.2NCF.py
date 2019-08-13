@@ -92,8 +92,8 @@ class NCF(object):
             self.logits_dense = tf.reshape(self.logits, [-1])
 
         with tf.name_scope("loss"):
-            self.loss=tf.nn.softmax_cross_entropy_with_logits(labels=self.label,logits=self.logits_dense,name="loess")
-            self.mean_loss=-tf.reduce_mean(self.loss)
+            self.loss=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.label,logits=self.logits_dense,name="loess")
+            self.mean_loss=tf.reduce_mean(self.loss)
 
         with tf.name_scope("optimzation"):
             self.optimzer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.mean_loss)
@@ -126,7 +126,7 @@ if __name__=="__main__":
     df_train_date1=df_train_date1.sample(len(df_train_date1),replace=False)
     del df_train_date
     total=len(df_train_date1)
-    batch_size=256
+    batch_size=2048
     model_path="./model"
 
 
@@ -160,8 +160,8 @@ if __name__=="__main__":
 
            mean_loss=model.train(sess,count)
            count=count+1
-           print "index "+str(i)+" mean loss:"+str(mean_loss)
-           checkpoint_path = os.path.join(model_path, "NCF.ckpt")
+           print "index %d mean loss %f " % i,mean_loss
+        checkpoint_path = os.path.join(model_path, "NCF.ckpt")
         model.saver.save(sess, checkpoint_path, global_step=count)
 
 
