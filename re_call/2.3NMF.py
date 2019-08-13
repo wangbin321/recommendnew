@@ -97,7 +97,7 @@ class NFM(object):
 
                 loss,_= sess.run([self.loss,self.optimizer],feed_dict=feed_dict)
 
-                print "index "+str(i*(j+1))+" mean loss  " +str(loss)
+                print ("index "+str(i*(j+1))+" mean loss  " +str(loss))
             checkpoint_path = os.path.join(model_path, "NCF.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=j)
 
