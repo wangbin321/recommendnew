@@ -104,7 +104,7 @@ class NFM(object):
 model=NFM("train.data")
 init=tf.global_variables_initializer()
 
-with tf.Session() as sess:
+with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     sess.run(init)
     model.run(sess)
 
