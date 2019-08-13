@@ -7,6 +7,8 @@ import json
 from scipy.sparse import coo_matrix
 import pickle
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 class NFM(object):
     def __init__(self,file_path):
@@ -98,6 +100,10 @@ class NFM(object):
 
 model=NFM("train.data")
 init=tf.global_variables_initializer()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+config.gpu_options.per_process_gpu_memory_fraction = 0.4
+
 with tf.Session() as sess:
     sess.run(init)
     model.run(sess)
