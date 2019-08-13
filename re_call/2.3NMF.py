@@ -42,7 +42,7 @@ class NFM(object):
 
     def add_model(self):
 
-        with tf.device('/gpu:0'):
+
 
             user_input = tf.nn.embedding_lookup(self.uid_embedding, self.user)
             item_input = tf.nn.embedding_lookup(self.item_embedding, self.item)
@@ -106,10 +106,10 @@ init=tf.global_variables_initializer()
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.4
-
-with tf.Session() as sess:
-    sess.run(init)
-    model.run(sess)
+with tf.device('/gpu:0'):
+    with tf.Session(config=config) as sess:
+        sess.run(init)
+        model.run(sess)
 
 
 
