@@ -30,19 +30,18 @@ class NFM(object):
              self.add_model()
 
     def add_placeholders(self):
-        with tf.device('/gpu:0'):
+
             self.user = tf.placeholder(tf.int32)
             self.item = tf.placeholder(tf.int32)
             self.rate = tf.placeholder(tf.int32)
     def get_embedding(self):
-        with tf.device('/gpu:0'):
+
             self.uid_embedding=tf.get_variable(name="uid_embedding",shape=[len(self.uid_id_dict),self.shape[0]],
                                                initializer=tf.random_normal_initializer(mean=0,stddev=0.01))
             self.item_embedding=tf.get_variable(name="item_embedding",shape=[len(self.item_id_dict),self.shape[0]],
                                                initializer=tf.random_normal_initializer(mean=0,stddev=0.01))
 
     def add_model(self):
-        with tf.device('/gpu:0'):
 
 
             user_input = tf.nn.embedding_lookup(self.uid_embedding, self.user)
@@ -104,10 +103,8 @@ class NFM(object):
 
 model=NFM("train.data")
 init=tf.global_variables_initializer()
-config = tf.ConfigProto(log_device_placement=True)
-config.gpu_options.allow_growth = True
 
-with tf.Session(config=config) as sess:
+with tf.Session() as sess:
     sess.run(init)
     model.run(sess)
 
