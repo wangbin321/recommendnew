@@ -38,11 +38,11 @@ class NFM(object):
         with tf.device('/gpu:0'):
             self.uid_embedding=tf.get_variable(name="uid_embedding",shape=[len(self.uid_id_dict),self.shape[0]],
                                                initializer=tf.random_normal_initializer(mean=0,stddev=0.01))
-            self.item_embedding=tf.get_variable(name="item_embedding",shape=[len(self.item_id_dict),self.shape[0]],\
+            self.item_embedding=tf.get_variable(name="item_embedding",shape=[len(self.item_id_dict),self.shape[0]],
                                                initializer=tf.random_normal_initializer(mean=0,stddev=0.01))
 
     def add_model(self):
-
+        with tf.device('/gpu:0'):
 
 
             user_input = tf.nn.embedding_lookup(self.uid_embedding, self.user)
@@ -51,7 +51,7 @@ class NFM(object):
             def init_variable(shape, name):
                 return tf.Variable(tf.truncated_normal(shape=shape, dtype=tf.float32, stddev=0.01), name=name)
 
-            with tf.name_scope("User_Layer") and  tf.device('/gpu:0'):
+            with tf.name_scope("User_Layer") :
                 user_W1 = init_variable([self.shape[1], self.userLayer[0]], "user_W1")
                 user_out = tf.matmul(user_input, user_W1)
                 for i in range(0, len(self.userLayer)-1):
@@ -59,7 +59,7 @@ class NFM(object):
                     b = init_variable([self.userLayer[i+1]], "user_b"+str(i+2))
                     user_out = tf.nn.relu(tf.add(tf.matmul(user_out, W), b))
 
-            with tf.name_scope("Item_Layer") and  tf.device('/gpu:0'):
+            with tf.name_scope("Item_Layer") :
                 item_W1 = init_variable([self.shape[0], self.itemLayer[0]], "item_W1")
                 item_out = tf.matmul(item_input, item_W1)
                 for i in range(0, len(self.itemLayer)-1):
@@ -71,11 +71,11 @@ class NFM(object):
                 norm_item_output = tf.sqrt(tf.reduce_sum(tf.square(item_out), axis=1))
                 self.y_ = tf.reduce_sum(tf.multiply(user_out, item_out), axis=1, keep_dims=False) / (norm_item_output* norm_user_output)
                 self.y_ = tf.maximum(1e-6, self.y_)
-            with tf.name_scope("loss") and  tf.device('/gpu:0'):
+            with tf.name_scope("loss") :
                 self.logit=tf.nn.softmax(self.y_)
                 self.logit=tf.reshape(self.logit,shape=[-1])
                 self.loss=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.rate,logits=self.logit))
-            with tf.name_scope("optimizer") and  tf.device('/gpu:0'):
+            with tf.name_scope("optimizer") :
                 self.optimizer=tf.train.AdamOptimizer(learning_rate=0.001).minimize(self.loss)
 
 
@@ -106,7 +106,6 @@ model=NFM("train.data")
 init=tf.global_variables_initializer()
 config = tf.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.4
 
 with tf.Session(config=config) as sess:
     sess.run(init)
