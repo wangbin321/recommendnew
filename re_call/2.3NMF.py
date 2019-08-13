@@ -104,7 +104,7 @@ class NFM(object):
 
 model=NFM("train.data")
 init=tf.global_variables_initializer()
-config = tf.ConfigProto()
+config = tf.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.4
 
