@@ -63,7 +63,10 @@ if __name__=="__main__":
             sess.run(tf.global_variables_initializer())
         count=1
         for file in dir:
+           print("read file "+file)
            for i in   pd.read_csv("BPR/"+file,chunksize=batch_size):
+               print(i.head(3))
+               print("====="*3)
                uid=i["uid"].values
                item1=i["item1"].values
                item2=i["item2"].values
