@@ -70,6 +70,7 @@ if __name__=="__main__":
             sess.run(tf.global_variables_initializer())
         count=1
         count_size=0
+        total_loss=0.0
         for x in range(1000):
             for file in dir:
                print("read file "+file)
@@ -81,9 +82,12 @@ if __name__=="__main__":
                    feed_dict={model.uid:uid,model.item1:item1,model.item2:item2,model.target:target}
 
                    loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict)
-                   count_size=0
-                   if count_size%100==0:
-                       print(loss)
+                   count_size=count_size+1
+                   total_loss=total_loss+loss
+
+                   if  count_size!=0 and count_size%100==0:
+                       print("curent lost:" + str(loss))
+                       print("avg lost:   "+str(total_loss/count_size)  )
 
             checkpoint_path = os.path.join(model_path, "BPR.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=count)
