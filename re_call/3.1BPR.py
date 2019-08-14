@@ -1,13 +1,8 @@
 # -*- coding:utf-8 -*-
 import tensorflow as tf
-import numpy as np
-import pandas as pd
-import os
 import pickle
-
-
-
-
+import pandas as pd
+import numpy as np
 class BPR(object):
     def __init__(self,uid_size,item_size,hidden_dim,learn_rate):
         self.uid_size=uid_size
@@ -34,19 +29,20 @@ class BPR(object):
         self.item2_feature=tf.nn.embedding_lookup(self.item_embedding,self.item2)
 
         self.loss1=tf.reduce_mean(tf.matmul(self.uid_feature,tf.subtract(self.item1_feature,self.item2_feature),transpose_b=True),1)
-        self.loss2=tf.nn.softmax(self.loss)
 
-        self.loss3=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.target,logits=self.loss)
+        self.target=tf.cast(self.target,tf.float32)
+        self.loss3=tf.nn.sigmoid_cross_entropy_with_logits(labels=self.target,logits=self.loss1)
         self.l2_norm = tf.add_n([
             tf.reduce_sum(tf.multiply(self.uid_feature, self.uid_feature)),
-            tf.reduce_sum(tf.multiply( self.item1,  self.item1)),
-            tf.reduce_sum(tf.multiply( self.item2,  self.item2))
+            tf.reduce_sum(tf.multiply(self.item1_feature, self.item1_feature)),
+            tf.reduce_sum(tf.multiply( self.item2_feature,  self.item2_feature))
         ])
-        self.loss=self.loss3+self.l2_norm
+        self.loss4=self.loss3+self.l2_norm
+        self.loss=tf.reduce_mean(self.loss4)
 
 
     def get_optimizer(self):
-        self.optimizer=tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.loss)
+        self.optimizer=tf.train.AdamOptimizer(learning_rate=0.00001).minimize(self.loss)
         self.saver = tf.train.Saver(tf.global_variables())
 
 
@@ -56,7 +52,7 @@ if __name__=="__main__":
     item_size=625174
 
     hidden_dim=256
-    batch_size=218
+    batch_size=128
 
     model=BPR(uid_szie,item_size,hidden_dim,0.01)
     model_path="BPRModel/model"
@@ -68,40 +64,27 @@ if __name__=="__main__":
         else:
             print("Creating model with fresh parameters.")
             sess.run(tf.global_variables_initializer())
-        count=1
-        count_size=0
-        total_loss=0.0
+        count = 1
+        count_size = 0
+        total_loss = 0.0
         for x in range(1000):
             for file in dir:
-               print("read file "+file)
-               for i in   pd.read_csv("BPR/"+file,chunksize=batch_size):
-                   uid=i["uid"].values
-                   item1=i["item1"].values
-                   item2=i["item2"].values
-                   target=i["target"].values
-                   feed_dict={model.uid:uid,model.item1:item1,model.item2:item2,model.target:target}
+                print("read file " + file)
+                for i in pd.read_csv("BPR/" + file, chunksize=batch_size):
+                    uid = i["uid"].values
+                    item1 = i["item1"].values
+                    item2 = i["item2"].values
+                    target = i["target"].values
+                    feed_dict = {model.uid: uid, model.item1: item1, model.item2: item2, model.target: target}
 
-                   loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict)
-                   count_size=count_size+1
-                   total_loss=total_loss+loss
+                    loss, _ = sess.run([model.loss, model.optimizer], feed_dict=feed_dict)
+                    count_size = count_size + 1
+                    total_loss = total_loss + loss
 
-                   if  count_size!=0 and count_size%100==0:
-                       print("curent lost:" + str(loss))
-                       print("avg lost:   "+str(total_loss/count_size)  )
+                    if count_size != 0 and count_size % 100 == 0:
+                        print("curent lost:" + str(loss))
+                        print("avg lost:   " + str(total_loss / count_size))
 
             checkpoint_path = os.path.join(model_path, "BPR.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=count)
-            count=count+1
-
-
-
-
-
-
-
-
-
-
-
-
-
+            count = count + 1
