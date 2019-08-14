@@ -6,7 +6,7 @@ import gc
 
 [uid_id_dict, id_uid_dict, item_id_dict, id_item_dict, cate_id_dict, id_cate_dict, df_train_date] = pickle.load(
     open("train.data", mode="rb"))
-uidkeys=uid_id_dict.keys()
+uidkeys=list(uid_id_dict.keys())
 total=len(uidkeys)
 
 def f(df):
