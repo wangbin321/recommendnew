@@ -62,22 +62,24 @@ if __name__=="__main__":
             print("Creating model with fresh parameters.")
             sess.run(tf.global_variables_initializer())
         count=1
-        for file in dir:
-           print("read file "+file)
-           for i in   pd.read_csv("BPR/"+file,chunksize=batch_size):
-               print(i.head(3))
-               print("====="*3)
-               uid=i["uid"].values
-               item1=i["item1"].values
-               item2=i["item2"].values
-               target=i["target"].values
-               feed_dict={model.uid:uid,model.item1:item1,model.item2:item2,model.target:target}
+        count_size=0
+        for x in range(1000):
+            for file in dir:
+               print("read file "+file)
+               for i in   pd.read_csv("BPR/"+file,chunksize=batch_size):
+                   uid=i["uid"].values
+                   item1=i["item1"].values
+                   item2=i["item2"].values
+                   target=i["target"].values
+                   feed_dict={model.uid:uid,model.item1:item1,model.item2:item2,model.target:target}
 
-               loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict)
-               print(loss)
-           checkpoint_path = os.path.join(model_path, "BPR.ckpt")
-           model.saver.save(sess, checkpoint_path, global_step=count)
-           count=count+1
+                   loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict)
+                   count_size=0
+                   if count_size%100==0:
+                       print(loss)
+            checkpoint_path = os.path.join(model_path, "BPR.ckpt")
+            model.saver.save(sess, checkpoint_path, global_step=count)
+            count=count+1
 
 
 
