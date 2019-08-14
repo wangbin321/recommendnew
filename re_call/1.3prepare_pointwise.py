@@ -46,8 +46,8 @@ size=100
 num=int(total/size)
 for i in range(0,101):
     tmp_keys=uidkeys[i*num:(i*num+num)]
-    df_train_date1=df_train_date[df_train_date["uid"]]
-    result = f(df_train_date).reset_index()
+    df_train_date1=df_train_date[df_train_date["uid"].isin(tmp_keys)]
+    result = f(df_train_date1).reset_index()
     result.columns = ["uid", "item1", "item2", "target"]
     result = result[["uid", "item1", "item2", "target"]]
     result.to_csv("BPR/BPR"+str(i)+".csv")
