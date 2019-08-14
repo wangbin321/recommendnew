@@ -37,11 +37,12 @@ class BPR(object):
         self.loss=tf.nn.softmax(self.loss)
 
         self.loss=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.target,logits=self.loss)
-        self.saver = tf.train.Saver(tf.global_variables())
 
 
     def get_optimizer(self):
         self.optimizer=tf.train.AdamOptimizer(learning_rate=self.learn_rate).minimize(self.loss)
+        self.saver = tf.train.Saver(tf.global_variables())
+
 
 if __name__=="__main__":
     dir=os.listdir("BPR")
@@ -49,9 +50,9 @@ if __name__=="__main__":
     item_size=625174
 
     hidden_dim=256
-    batch_size=512
+    batch_size=218
 
-    model=BPR(uid_szie,item_size,hidden_dim,0.05)
+    model=BPR(uid_szie,item_size,hidden_dim,0.01)
     model_path="BPRModel/model"
     with tf.Session() as sess:
         ckpt = tf.train.get_checkpoint_state(model_path)
