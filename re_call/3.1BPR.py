@@ -33,14 +33,20 @@ class BPR(object):
         self.item1_feature=tf.nn.embedding_lookup(self.item_embedding,self.item1)
         self.item2_feature=tf.nn.embedding_lookup(self.item_embedding,self.item2)
 
-        self.loss=tf.reduce_mean(tf.matmul(self.uid_feature,tf.subtract(self.item1_feature,self.item2_feature),transpose_b=True),1)
-        self.loss=tf.nn.softmax(self.loss)
+        self.loss1=tf.reduce_mean(tf.matmul(self.uid_feature,tf.subtract(self.item1_feature,self.item2_feature),transpose_b=True),1)
+        self.loss2=tf.nn.softmax(self.loss)
 
-        self.loss=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.target,logits=self.loss)
+        self.loss3=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.target,logits=self.loss)
+        self.l2_norm = tf.add_n([
+            tf.reduce_sum(tf.multiply(self.uid_feature, self.uid_feature)),
+            tf.reduce_sum(tf.multiply( self.item1,  self.item1)),
+            tf.reduce_sum(tf.multiply( self.item2,  self.item2))
+        ])
+        self.loss=self.loss3+self.l2_norm
 
 
     def get_optimizer(self):
-        self.optimizer=tf.train.AdamOptimizer(learning_rate=self.learn_rate).minimize(self.loss)
+        self.optimizer=tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.loss)
         self.saver = tf.train.Saver(tf.global_variables())
 
 
