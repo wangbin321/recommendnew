@@ -17,6 +17,7 @@ class BPR(object):
         self.get_placeholder()
         self.get_embedding()
         self.create_model()
+        self.get_optimizer()
     def  get_placeholder(self):
          self.uid=tf.placeholder(tf.int32,name="uid")
          self.item1=tf.placeholder(tf.int32,name="item")
@@ -39,7 +40,7 @@ class BPR(object):
         self.saver = tf.train.Saver(tf.global_variables())
 
 
-    def optimizer(self):
+    def get_optimizer(self):
         self.optimizer=tf.train.AdamOptimizer(learning_rate=self.learn_rate).minimize(self.loss)
 
 if __name__=="__main__":
