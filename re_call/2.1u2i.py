@@ -47,7 +47,6 @@ with  open("svdpp.model",mode="wb") as f:
     pickle.dump(model,f)
 f=open("svdpp.model",mode="rb")
 model=pickle.load(f)
-m
 u_mat=model.pu
 i_mat=model.qi
 
