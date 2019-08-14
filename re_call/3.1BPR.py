@@ -78,6 +78,7 @@ if __name__=="__main__":
                    count_size=0
                    if count_size%100==0:
                        print(loss)
+
             checkpoint_path = os.path.join(model_path, "BPR.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=count)
             count=count+1
