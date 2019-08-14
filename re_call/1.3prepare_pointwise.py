@@ -2,9 +2,12 @@
 import pickle
 import pandas as pd
 import numpy as np
+import gc
 
 [uid_id_dict, id_uid_dict, item_id_dict, id_item_dict, cate_id_dict, id_cate_dict, df_train_date] = pickle.load(
     open("train.data", mode="rb"))
+uidkeys=uid_id_dict.keys()
+total=len(uidkeys)
 
 def f(df):
     def gener(x,y,target):
@@ -35,10 +38,18 @@ def f(df):
 target_dict={'pv':0,'cart':1,'fav':2,'buy':3}
 print(df_train_date["action"].value_counts())
 df_train_date["target"]=df_train_date["action"].map(target_dict)
-df_train_date=df_train_date[["uid","itemid","target"]].drop_duplicates()
+df_train_date=df_train_date[["uid","itemid","target"]]
 df_train_date.columns=["uid","item","target"]
+gc.collect()
 
-result=f(df_train_date).reset_index()[["uid","item1","item2","target"]]
-with open("BPR.data",mode="wb") as f:
-     pickle.dump(result,f)
+size=100
+num=int(total/size)
+for i in range(0,101):
+    tmp_keys=uidkeys[i*num:(i*num+num)]
+    df_train_date1=df_train_date[df_train_date["uid"]]
+    result = f(df_train_date).reset_index()
+    result.columns = ["uid", "item1", "item2", "target"]
+    result = result[["uid", "item1", "item2", "target"]]
+    result.to_csv("BPR/BPR"+str(i)+".csv")
+
 
