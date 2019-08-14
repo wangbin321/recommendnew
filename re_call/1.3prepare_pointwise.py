@@ -32,7 +32,7 @@ def f(df):
         b_item=df[df["target"]==b]["item"].values
         tmp1=gener(a_item,b_item,1 )
         df_list.append(tmp1)
-    tmp2=gener(df[df["target"]!=0].values,np.random.choice(df[df["target"]==0]["item"].values,size=100,replace=True),1)
+    tmp2=gener(list(np.random.choice(df[df["target"]==0]["item"].values,size=100,replace=True)),df[df["target"]!=0]["item"].values,0)
     df_list.append(tmp2)
     return pd.concat(df_list,axis=0)
 target_dict={'pv':0,'cart':1,'fav':2,'buy':3}
@@ -45,11 +45,12 @@ gc.collect()
 size=20
 num=int(total/size)
 
-for i in range(0,101):
+for i in range(0,size+1):
     tmp_keys=uidkeys[i*num:(i*num+num)]
     df_train_date1=df_train_date[df_train_date["uid"].isin(tmp_keys)]
     result =df_train_date1.groupby(["uid"]).apply(lambda  x:f(x)).reset_index()
-    result.columns = ["uid", "item1", "item2", "target"]
+    print(result.head(100))
+    # result.columns = ["uid", "item1", "item2", "target"]
     result = result[["uid", "item1", "item2", "target"]]
     result.to_csv("BPR/BPR"+str(i)+".csv")
 
