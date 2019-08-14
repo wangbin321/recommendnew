@@ -20,8 +20,8 @@ class BPR(object):
         self.get_optimizer()
     def  get_placeholder(self):
          self.uid=tf.placeholder(tf.int32,name="uid")
-         self.item1=tf.placeholder(tf.int32,name="item")
-         self.item2 = tf.placeholder(tf.int32, name="item")
+         self.item1=tf.placeholder(tf.int32,name="item1")
+         self.item2 = tf.placeholder(tf.int32, name="item2")
          self.target=tf.placeholder(tf.int32,name="target")
     def get_embedding(self):
         self.uid_embedding=tf.Variable(tf.truncated_normal(shape=(self.uid_size,self.hidden_dim),mean=0,stddev=0.01),name="uid_embedding")
@@ -33,7 +33,7 @@ class BPR(object):
         self.item1_feature=tf.nn.embedding_lookup(self.item_embedding,self.item1)
         self.item2_feature=tf.nn.embedding_lookup(self.item_embedding,self.item2)
 
-        self.loss=tf.reduce_mean(tf.matmul(self.uid_feature,(self.item1_feature-self.item2_feature)),1)
+        self.loss=tf.reduce_mean(tf.matmul(self.uid_feature,tf.subtract(self.item1_feature,self.item2_feature),transpose_b=True),1)
         self.loss=tf.nn.softmax(self.loss)
 
         self.loss=tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.target,logits=self.loss)
@@ -45,9 +45,9 @@ class BPR(object):
 
 if __name__=="__main__":
     dir=os.listdir("BPR")
-    [uid_id_dict,_,item_id_dict,_,_,_,_]=pickle.load(open("train.data",mode="rb"))
-    uid_szie=len(uid_id_dict)+1
-    item_size=len(item_id_dict)+1
+    uid_szie=19544
+    item_size=625174
+
     hidden_dim=256
     batch_size=512
 
