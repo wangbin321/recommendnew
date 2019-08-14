@@ -23,8 +23,8 @@ class BPR(object):
          self.item2 = tf.placeholder(tf.int32, name="item")
          self.target=tf.placeholder(tf.int32,name="target")
     def get_embedding(self):
-        self.uid_embedding=tf.Variable(tf.random.truncated_normal(shape=(self.uid_size,self.hidden_dim),mean=0,stddev=0.01),name="uid_embedding")
-        self.item_embedding=tf.Variable(tf.random.truncated_normal(shape=(self.item_size,self.hidden_dim),mean=0,stddev=0.01),name="item_embedding")
+        self.uid_embedding=tf.Variable(tf.truncated_normal(shape=(self.uid_size,self.hidden_dim),mean=0,stddev=0.01),name="uid_embedding")
+        self.item_embedding=tf.Variable(tf.truncated_normal(shape=(self.item_size,self.hidden_dim),mean=0,stddev=0.01),name="item_embedding")
 
 
     def create_model(self):
