@@ -44,6 +44,7 @@ gc.collect()
 
 size=100
 num=int(total/size)
+
 for i in range(0,101):
     tmp_keys=uidkeys[i*num:(i*num+num)]
     df_train_date1=df_train_date[df_train_date["uid"].isin(tmp_keys)]
