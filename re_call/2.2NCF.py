@@ -96,7 +96,7 @@ class NCF(object):
             self.mean_loss=tf.reduce_mean(self.loss)
 
         with tf.name_scope("optimzation"):
-            self.optimzer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.mean_loss)
+            self.optimzer = tf.train.AdamOptimizer().minimize(self.mean_loss)
 
         self.writer = tf.summary.FileWriter('./graphs/NCF', tf.get_default_graph())
         with tf.name_scope("summaries"):

@@ -49,3 +49,6 @@ model=pickle.load(f)
 
 u_mat=model.pu
 i_mat=model.qi
+
+f1=open("mat.dat",mode="wb")
+pickle.dump((u_mat,i_mat),f1)
