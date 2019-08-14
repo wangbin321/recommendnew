@@ -42,7 +42,7 @@ df_train_date=df_train_date[["uid","itemid","target"]]
 df_train_date.columns=["uid","item","target"]
 gc.collect()
 
-size=100
+size=20
 num=int(total/size)
 
 for i in range(0,101):
