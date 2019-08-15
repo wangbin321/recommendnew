@@ -58,8 +58,8 @@ if __name__=="__main__":
     uid_szie=19544
     item_size=625174
 
-    hidden_dim=256
-    batch_size=128
+    hidden_dim=128
+    batch_size=256
 
     model=BPR(uid_szie,item_size,hidden_dim,0.01)
     model_path="BPRModel/model"
@@ -87,9 +87,10 @@ if __name__=="__main__":
                     target = i["target"].values
                     feed_dict = {model.uid: uid, model.item1: item1, model.item2: item2, model.target: target}
 
-                    loss, _ = sess.run([model.auc_value, model.auc_op], feed_dict=feed_dict)
+                    auc, _,loss,_ = sess.run([model.auc_value, model.auc_op,model.loss,model.optimizer], feed_dict=feed_dict)
 
-                    print(loss)
+                    print("loss:"+str(loss))
+                    print("auc:"+str(auc))
                     # count_size = count_size + 1
                     # total_loss = total_loss + loss
                     #
