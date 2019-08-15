@@ -14,6 +14,7 @@ class BPR(object):
         self.get_embedding()
         self.create_model()
         self.get_optimizer()
+        self.get_auc()
     def  get_placeholder(self):
          self.uid=tf.placeholder(tf.int32,name="uid")
          self.item1=tf.placeholder(tf.int32,name="item1")
@@ -47,11 +48,10 @@ class BPR(object):
         self.saver = tf.train.Saver(tf.global_variables())
 
     def get_auc(self):
-        prediction_tensor = tf.convert_to_tensor(self.loss3)
-        label_tensor = tf.convert_to_tensor(self.target)
-        auc_value, auc_op = tf.metrics.auc(label_tensor, prediction_tensor, num_thresholds=2000)
-        self.auc_value=auc_value
-        self.auc_op=auc_op
+        self.prediction_tensor = tf.convert_to_tensor(self.loss3)
+        self.label_tensor = tf.convert_to_tensor(self.target)
+        self.auc_value,self.auc_op = tf.metrics.auc(self.label_tensor,self. prediction_tensor)
+
 
 if __name__=="__main__":
     dir=os.listdir("BPR")
