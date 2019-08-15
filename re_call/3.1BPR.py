@@ -3,6 +3,7 @@ import tensorflow as tf
 import pickle
 import pandas as pd
 import numpy as np
+import os
 class BPR(object):
     def __init__(self,uid_size,item_size,hidden_dim,learn_rate):
         self.uid_size=uid_size
@@ -45,6 +46,12 @@ class BPR(object):
         self.optimizer=tf.train.AdamOptimizer(learning_rate=0.00001).minimize(self.loss)
         self.saver = tf.train.Saver(tf.global_variables())
 
+    def get_auc(self):
+        prediction_tensor = tf.convert_to_tensor(self.loss3)
+        label_tensor = tf.convert_to_tensor(self.target)
+        auc_value, auc_op = tf.metrics.auc(label_tensor, prediction_tensor, num_thresholds=2000)
+        self.auc_value=auc_value
+        self.auc_op=auc_op
 
 if __name__=="__main__":
     dir=os.listdir("BPR")
@@ -56,7 +63,10 @@ if __name__=="__main__":
 
     model=BPR(uid_szie,item_size,hidden_dim,0.01)
     model_path="BPRModel/model"
-    with tf.Session() as sess:
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    with tf.Session(config=config) as sess:
         ckpt = tf.train.get_checkpoint_state(model_path)
         if ckpt:
             print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
@@ -67,7 +77,7 @@ if __name__=="__main__":
         count = 1
         count_size = 0
         total_loss = 0.0
-        for x in range(1000):
+        for x in range(100):
             for file in dir:
                 print("read file " + file)
                 for i in pd.read_csv("BPR/" + file, chunksize=batch_size):
@@ -77,13 +87,15 @@ if __name__=="__main__":
                     target = i["target"].values
                     feed_dict = {model.uid: uid, model.item1: item1, model.item2: item2, model.target: target}
 
-                    loss, _ = sess.run([model.loss, model.optimizer], feed_dict=feed_dict)
-                    count_size = count_size + 1
-                    total_loss = total_loss + loss
+                    loss, _ = sess.run([model.auc_value, model.auc_op], feed_dict=feed_dict)
 
-                    if count_size != 0 and count_size % 100 == 0:
-                        print("curent lost:" + str(loss))
-                        print("avg lost:   " + str(total_loss / count_size))
+                    print(loss)
+                    # count_size = count_size + 1
+                    # total_loss = total_loss + loss
+                    #
+                    # if count_size != 0 and count_size % 100 == 0:
+                    #     print("curent lost:" + str(loss))
+                    #     print("avg lost:   " + str(total_loss / count_size))
 
             checkpoint_path = os.path.join(model_path, "BPR.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=count)
