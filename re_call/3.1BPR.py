@@ -4,6 +4,7 @@ import pickle
 import pandas as pd
 import numpy as np
 import os
+from sklearn.metrics import accuracy_score
 class BPR(object):
     def __init__(self,uid_size,item_size,hidden_dim,learn_rate):
         self.uid_size=uid_size
@@ -50,7 +51,6 @@ class BPR(object):
     def get_auc(self):
         self.prediction_tensor = tf.convert_to_tensor(self.loss3)
         self.label_tensor = tf.convert_to_tensor(self.target)
-        self.auc_value,self.auc_op = tf.metrics.auc(self.label_tensor,self. prediction_tensor)
 
 
 if __name__=="__main__":
@@ -87,16 +87,16 @@ if __name__=="__main__":
                     target = i["target"].values
                     feed_dict = {model.uid: uid, model.item1: item1, model.item2: item2, model.target: target}
 
-                    auc, _,loss,_ = sess.run([model.auc_value, model.auc_op,model.loss,model.optimizer], feed_dict=feed_dict)
+                    loss3, target,loss,_ = sess.run([model.loss3, model.target,model.loss,model.optimizer], feed_dict=feed_dict)
 
                     print("loss:"+str(loss))
-                    print("auc:"+str(auc))
+                    print(loss3)
+                    print("====="*10)
+                    auc=accuracy_score(target,loss3)
+                    print("auc=="+str(auc))
+
+                    print(target)
                     # count_size = count_size + 1
-                    # total_loss = total_loss + loss
-                    #
-                    # if count_size != 0 and count_size % 100 == 0:
-                    #     print("curent lost:" + str(loss))
-                    #     print("avg lost:   " + str(total_loss / count_size))
 
             checkpoint_path = os.path.join(model_path, "BPR.ckpt")
             model.saver.save(sess, checkpoint_path, global_step=count)
