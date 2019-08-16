@@ -1,14 +1,12 @@
 # -*- coding:utf-8 -*-
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pandas as pd
 import  tensorflow as tf
 import numpy as np
-import pickle
 import gc
 import logging
 logging.basicConfig(level=logging.DEBUG,
-                    filename='new.log',
+                    filename='FM.log',
                     filemode='a',
                     format=
                     '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
