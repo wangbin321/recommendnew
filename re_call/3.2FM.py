@@ -4,6 +4,14 @@ import  tensorflow as tf
 import numpy as np
 import pickle
 import gc
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    filename='new.log',
+                    filemode='a',
+                    format=
+                    '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+
+                    )
 
 class  FM(object):
      def __init__(self,feature_size,lr,dim):
@@ -94,12 +102,14 @@ if __name__=="__main__":
         else:
             print("Creating model with fresh parameters.")
             sess.run(tf.global_variables_initializer())
+        count=0
         for count in range(0,echo) :
             for df in pd.read_csv("df_train_date.csv",chunksize=512):
                     x,y =generfeature(df,uidfeather_dict,itemfeather_dict)
                     feed_dict1={model.x:x,model.y:y}
+                    count=count+len(x)
                     loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
-                    print(loss)
+                    logging.info("iter:{},count:{},  loss:{}" % count,count, loss)
 
             model.saver.save(sess=sess,save_path=model_dir,global_step=count)
 
