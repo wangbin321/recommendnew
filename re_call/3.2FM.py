@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pandas as pd
 import  tensorflow as tf
@@ -46,8 +45,8 @@ class  FM(object):
          self.out=tf.nn.sigmoid(self.out)
          self.loss=tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y,logits=self.out)
          self.loss=tf.reduce_mean(self.loss)
-         self.optimizer=tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
-         self.saver=tf.train.Saver()
+         self.optimizer=tf.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.loss)
+         self.saver=tf.train.Saver(max_to_keep=3)
 def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size = 50000,):
     total_len=len(df)
 
@@ -76,7 +75,7 @@ if __name__=="__main__":
     feature_size=69549
     echo=100
     batch_size=512
-    model=FM(feature_size,lr=0.001,dim=8)
+    model=FM(feature_size,lr=0.05,dim=8)
     uidfeather = np.load("uid",
                          allow_pickle=True)
     uidfeather = pd.DataFrame(uidfeather)
@@ -106,14 +105,15 @@ if __name__=="__main__":
             print("Creating model with fresh parameters.")
             sess.run(tf.global_variables_initializer())
         count=0
-        for index in range(0,echo) :
-            for df in pd.read_csv("df_train_date.csv",chunksize=512):
+        for index in range(0,2) :
+            for df in pd.read_csv("df_train_date.csv",chunksize=1024):
                     x,y =generfeature(df,uidfeather_dict,itemfeather_dict)
                     feed_dict1={model.x:x,model.y:y}
                     count=count+len(x)
                     loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
-                    logging.info("iter:{%d},count:{%d},  loss:{%6.3f}" % (index,count, loss))
-
+                    logging.info("iter:%d,count:%d,  loss: %6.5f" % (index,count, loss))
+                    if count!=0 and count%100000==0:
+                        model.saver.save(sess=sess, save_path=model_dir, global_step=count)
             model.saver.save(sess=sess,save_path=model_dir,global_step=count)
 
 
