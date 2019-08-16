@@ -1,4 +1,7 @@
 # -*- coding:utf-8 -*-
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pandas as pd
 import  tensorflow as tf
 import numpy as np
@@ -103,13 +106,13 @@ if __name__=="__main__":
             print("Creating model with fresh parameters.")
             sess.run(tf.global_variables_initializer())
         count=0
-        for count in range(0,echo) :
+        for index in range(0,echo) :
             for df in pd.read_csv("df_train_date.csv",chunksize=512):
                     x,y =generfeature(df,uidfeather_dict,itemfeather_dict)
                     feed_dict1={model.x:x,model.y:y}
                     count=count+len(x)
                     loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
-                    logging.info("iter:{},count:{},  loss:{}" % count,count, loss)
+                    logging.info("iter:{%d},count:{%d},  loss:{%6.3f}" % (index,count, loss))
 
             model.saver.save(sess=sess,save_path=model_dir,global_step=count)
 
