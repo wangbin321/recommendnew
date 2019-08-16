@@ -48,13 +48,13 @@ def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size 
     item_vec=[]
     for (index,value) in enumerate(df["uid"].values):
         feature[index][value]=1
-        while not uidfeather_dict.has_key(value):
+        while value not in uidfeather_dict:
             value=value-1
         uid_vec.append(uidfeather_dict[value])
 
     for (index,value) in enumerate(df["itemid"].values):
         feature[index][value+uid_szie]=1
-        while not itemfeather_dict.has_key(value):
+        while   value  not in itemfeather_dict:
             value=value-1
         item_vec.append(itemfeather_dict[value])
     x=np.concatenate([feature,uid_vec,item_vec],axis=1)
