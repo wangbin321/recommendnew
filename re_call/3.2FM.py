@@ -26,7 +26,7 @@ class  FM(object):
          self.x=tf.placeholder(tf.float32,shape=[None,self.feature_size],name="x")
          self.y=tf.placeholder(tf.float32,name="y")
 
-         self.embedding=tf.Variable(tf.truncated_normal(shape=(self.feature_size,self.dim),mean=0.0,stddev=0.001),name="eembedding")
+         self.embedding=tf.Variable(tf.truncated_normal(shape=(self.feature_size,self.dim),mean=0.0,stddev=0.001),name="embedding")
          self.w=tf.Variable(tf.truncated_normal(shape=[self.feature_size,1],mean=0.0,stddev=0.001),name="w")
          self.w0=tf.Variable(1.0,name='w0')
 
@@ -76,7 +76,7 @@ if __name__=="__main__":
     feature_size=69549
     echo=100
     batch_size=512
-    model=FM(feature_size,lr=0.05,dim=8)
+    model=FM(feature_size,lr=0.1,dim=8)
     uidfeather = np.load("uid",
                          allow_pickle=True)
     uidfeather = pd.DataFrame(uidfeather)
@@ -110,14 +110,13 @@ if __name__=="__main__":
             for df in pd.read_csv("df_train_date.csv",chunksize=5000):
                     x,y =generfeature(df,uidfeather_dict,itemfeather_dict)
                     feed_dict1={model.x:x,model.y:y}
-                    out=sess.run([model.out],feed_dict=feed_dict1)
-                    score=roc_auc_score(y_true=y,y_score=out)
-                    print(score)
-            #         count=count+len(x)
-            #         loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
-            #         logging.info("iter:%d,count:%d,  loss: %6.5f" % (index,count, loss))
-            #         if count!=0 and count%100000==0:
-            #             model.saver.save(sess=sess, save_path=model_dir, global_step=count)
-            # model.saver.save(sess=sess,save_path=model_dir,global_step=count)
+                    count=count+len(x)
+                    # out=sess.run([model.out],feed_dict=feed_dict1)
+                    #
+                    loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
+                    print(count,loss)
+                    if count!=0 and count%100000==0:
+                        model.saver.save(sess=sess, save_path=model_dir, global_step=count)
+            model.saver.save(sess=sess,save_path=model_dir,global_step=count)
 
 
