@@ -39,7 +39,7 @@ class  FM(object):
          self.out=tf.nn.sigmoid(self.out)
          self.loss=tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y,logits=self.out)
          self.loss=tf.      reduce_mean(self.loss)
-         self.optimizer=tf.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.loss)
+         self.optimizer=tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
          self.saver=tf.train.Saver(max_to_keep=3)
 def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size = 50000,):
     total_len=len(df)
@@ -100,15 +100,13 @@ if __name__=="__main__":
             sess.run(tf.global_variables_initializer())
         count=0
         for index in range(0,2) :
-            for df in pd.read_csv("df_train_date.csv",chunksize=5000):
+            for df in pd.read_csv("df_train_date.csv",chunksize=100):
                     x,y =generfeature(df,uidfeather_dict,itemfeather_dict)
-                    feed_dict1={model.x:x,model.y:y}
+                    feed_dict={model.x:x,model.y:y}
                     count=count+len(x)
-                    # out=sess.run([model.out],feed_dict=feed_dict1)
-                    #
-                    loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict1)
+                    loss,_=sess.run([model.loss,model.optimizer],feed_dict=feed_dict)
                     print(count,loss)
-                    if count!=0 and count%100000==0:
+                    if count!=0 and count%10000==0:
                         model.saver.save(sess=sess, save_path=model_dir, global_step=count)
             model.saver.save(sess=sess,save_path=model_dir,global_step=count)
 
