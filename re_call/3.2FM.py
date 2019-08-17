@@ -47,7 +47,7 @@ class  FM(object):
          self.loss=tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y,logits=self.out)
          self.loss=tf.      reduce_mean(self.loss)
          # self.optimizer=tf.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.loss)
-         # self.saver=tf.train.Saver(max_to_keep=3)
+         self.saver=tf.train.Saver(max_to_keep=3)
 def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size = 50000,):
     total_len=len(df)
 
@@ -72,7 +72,7 @@ def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size 
     y=df["action"].values
     return x,y
 if __name__=="__main__":
-    model_dir="FM_model"
+    model_dir="FM_Model"
     feature_size=69549
     echo=100
     batch_size=512
