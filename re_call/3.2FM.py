@@ -6,15 +6,8 @@ import pandas as pd
 import  tensorflow as tf
 import numpy as np
 import gc
-import logging
-from sklearn.metrics import roc_auc_score
-logging.basicConfig(level=logging.DEBUG,
-                    filename='FM.log',
-                    filemode='a',
-                    format=
-                    '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
 
-                    )
+from sklearn.metrics import roc_auc_score
 
 class  FM(object):
      def __init__(self,feature_size,lr,dim):
@@ -46,7 +39,7 @@ class  FM(object):
          self.out=tf.nn.sigmoid(self.out)
          self.loss=tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y,logits=self.out)
          self.loss=tf.      reduce_mean(self.loss)
-         # self.optimizer=tf.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.loss)
+         self.optimizer=tf.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.loss)
          self.saver=tf.train.Saver(max_to_keep=3)
 def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size = 50000,):
     total_len=len(df)
