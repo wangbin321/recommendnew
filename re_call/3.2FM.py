@@ -72,7 +72,7 @@ def generfeature( df,uidfeather_dict,itemfeather_dict,uid_szie = 19544,tem_size 
     y=df["action"].values
     return x,y
 if __name__=="__main__":
-    model_dir="./FM"
+    model_dir="FM_model"
     feature_size=69549
     echo=100
     batch_size=512
